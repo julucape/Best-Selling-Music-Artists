@@ -1,0 +1,176 @@
+---
+title: "Trabajo Individual:Best Selling Music Artists"
+author: "Juliet Allegra"
+date: "2023-01-05"
+image: "dataset-cover.jpeg"
+theme: cerulean
+editor: visual
+toc: true
+toc-location: left
+toc-depth: 3
+number-sections: true
+highlight-style: pygments
+code-fold: true
+code-tools: true
+html-math-method: katex
+---
+
+Repo utilizado para elaborar el trabajo individual para la asignatura "Programación y manejo de datos en la era del Big Data" de la Universitat de València durante el curso 2022-2023. La página web de la asignatura puede verse:[aqui](https://perezp44.github.io/intro-ds-22-23-web/)
+
+## Introducción
+
+La música depende de muchas cosas como el gusto, la cultura y la persona a quien le preguntas. La música es un lenguaje entendido por personas de todo el mundo. Y los artistas son los encargados de repartir ese lenguaje a los demás. Este trabajo está inspirado en mi propia curiosidad sobre el ranking de los mejores artistas que hayan pisado la tierra.
+
+![](dataset-cover.jpeg)
+
+## Datos
+
+La organización de música Recording Industry Association of America's (RIAA) de Estados Unidos realizauna lista de los [Best Selling Music Artists](https://www.riaa.com/gold-platinum/?tab_active=top_tallies&ttt=TAA#search_section) con artistas a partir del siglo XX. La lista se basa exclusivamente en la venta de récords mundiales, con ingresos a partir de 75 millones de dólares. Obtuve un Dataset de [Kaggle](https://www.kaggle.com/datasets/kabhishm/best-selling-music-artists-of-all-time) que contiene la informacion de los 121 artistas con mayores ingresos. Dicho Dataset contiene:
+
+\-'Artist' : Nombre del artista
+
+\-'Country' : País de origen del artista
+
+\-'period_active' : Periodo en que el artista realizo su música
+
+\-'Year' : Año de lanzamiento de su primer disco registrado
+
+\-'Genre' : Genero de música del artista
+
+\-'TCU' : Total unidadesde venta
+
+\-'Sales' : Ingresos totales de venta en millones de dólares
+
+```{r , echo =TRUE, results='hide', message=FALSE, warning=FALSE}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(ggridges)
+library(Polychrome)
+library(ggrepel)
+library(rworldmap)
+library(plotly)
+
+#Paleta de 50 colores
+P50 = createPalette(50,  c("#ff0000", "#00ff00", "#0000ff"))
+
+```
+
+## Ranking de los artistas según sus sales
+
+::: panel-tabset
+#### 1-40
+
+```{r, echo =TRUE, results='show', message=FALSE, warning=FALSE}
+best_selling_artists <- read_excel("kaggle/best_selling_artists.xlsx")
+
+
+a1<- best_selling_artists %>% select("Artist","Sales", "Year")
+a2 <- head(a1,40)
+a3 <- a1[41:81,]
+a4 <- a1[82:121,]
+
+f1 <-ggplot(a2, aes(x = reorder(Artist, Sales), y= Sales)) + geom_bar(stat = "identity", aes(fill=Artist)) + coord_flip()+ labs(x = "Artist") + scale_color_manual(P50) + theme(legend.position = "false") + theme_bw() 
+plotly::ggplotly(f1)
+
+```
+
+#### 41-81
+
+```{r, echo =TRUE, results='show', message=FALSE, warning=FALSE}
+f2 <- ggplot(a3, aes(x = reorder(Artist, Sales), Sales)) + geom_bar(stat = "identity", aes(fill=Artist)) + coord_flip()+ labs(x = "Artist")+ scale_color_manual(P50) + theme(legend.position = "false") + theme_bw()
+plotly::ggplotly(f2)
+```
+
+#### 82-121
+
+```{r, echo =TRUE, results='show', message=FALSE, warning=FALSE}
+f3<-ggplot(a4, aes(x = reorder(Artist, Sales), Sales)) + geom_bar(stat = "identity", aes(fill=Artist)) + coord_flip()+ labs(x = "Artist") + scale_color_manual(P50) + theme(legend.position = "false") + theme_bw()
+plotly::ggplotly(f3)
+```
+:::
+
+## Artistas segun su pais de origen
+
+::: panel-tabset
+#### Datos
+
+```{r,echo =TRUE, results='show', message=FALSE, warning=FALSE}
+Artist_per_country <- read_excel("kaggle/Num_of_artist.xlsx")
+
+DT::datatable(Artist_per_country)
+
+
+```
+
+#### Mapa
+
+```{r, echo =TRUE, results='show', message=FALSE, warning=FALSE}
+map.world <- map_data("world")
+
+map.world_joined <- left_join(map.world, Artist_per_country, by = c('region' = 'Country'))
+
+
+map.world_joined <- map.world_joined %>% mutate(fill_flg = ifelse(is.na(Number_of_Artist),F,T))
+
+f4 <- ggplot() +
+  geom_polygon(data = map.world_joined, aes(x = long, y = lat, group = group, fill = fill_flg)) +
+  geom_point() +
+  scale_fill_manual(values = c("#CCCCCC"," purple"))  +
+  theme(text = element_text(family = "Gill Sans", color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#444444")
+        ,plot.background = element_rect(fill = "#444444")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 30)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none") 
+plotly::ggplotly(f4)
+
+```
+
+Como podemos observar de los 121 artistas la mayoría son del Estados Unidos y Reino Unidos. La industria musical de estos países es fundamental para el mercado demúsica, ya que son hogares de los mejores artistas del mundo. Algo que ambos países tienen en común es el idioma, lo que nos da a entender es que la mayoría de consumo musical en el mundo es en inglés.
+:::
+
+## Artistas segun su genero de música
+
+::: panel-tabset
+#### Datos
+
+```{r,echo =TRUE, results='show', message=FALSE, warning=FALSE}
+
+df <- data.frame(
+  Genre = c("Rock and Roll", "Rock", "Reggae","R&B", "Progressive rock", "Pop rock", "Pop", "Latin", "Jazz", "Hip-hop", "Heavy Metal", "Hard Rock", "Country", "Celtic", "Alternative Rock"),
+  value = c(1, 19, 1, 16, 1, 20, 25, 3, 1, 9, 3, 7, 8, 1, 4)
+)
+
+DT::datatable(df)
+
+```
+
+#### Treemap
+
+```{r,echo =TRUE, results='show', message=FALSE, warning=FALSE}
+#install.packages("treemapify")
+library(treemapify)
+# install.packages("ggplot2")
+library(ggplot2)
+
+f5<-ggplot(df, aes(area = value, fill = Genre, label = value)) +
+  geom_treemap() +
+  geom_treemap_text(colour = "white",
+                    place = "centre",
+                    size = 15) 
+f5
+```
+
+Esta lista estima los géneros musicales con la respectiva popularidad dentro de la sociedad. Existe una relación positiva entre géneros musicales y la cultura. La música se considera un elemento fundamental de la cultura. La música comparte la percepción de una cultura a otra. De los 13 géneros musicales el top 5 son el Pop, Pop- rock, Rock, R&B, Hip-hop. La música pop (popular music) es parte de la cultura popular dirigido al público en general, El hip-hop es parte de la cultura urbana, Rock combina elementos de muchos géneros tales como blues, jazz, country con un toque eléctrico y, R&B es un género que representa la cultura afroamericana. Aun así, la cultura no es un determinante para disfrutar de música, para eso tenemos el gusto.
+:::
+
+## Conclucion
+
+El ranking de los mejores artistas musicales según sus ventas certificadas es una lista muy diversa, contiene todo tipo de género musical, nacionalidades, sexos y épocas. Algo que es muy notable es que todos estos artista influyeron de manera única y especial en el mundo musical. Es importante destacar que muchos de estos artistas alcanzaron el éxito hace décadas y aun así su marca en la música fue significativa. Como en los 60s conocido como la "invasión británica" con artistas como the Beatles y the Rolling Stones (ambos dentro del top 15). Estos artista transmiten mensajes, pensamientos, y culturas a través de todo el mundo. Personalmente no me imaginaria que sería la música sin Queen, Elton John o Beyonce entre otros. Es increíble como la música de estos iconos musicales me hacen sentir y es fascinante que millones de personas por el mundo han comprado su música y la escuchan igual que yo. La música para mi nos une como humanos y en un mundo con tanta indiferencia, es importante poder conectar en algo.
