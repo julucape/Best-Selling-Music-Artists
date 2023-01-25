@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Best Selling Music Artists",
+    "section": "",
+    "text": "Hola, Soy Juliet Allegra.\nEsta web sirve para presentar el trabajo individual para la asignatura “Programación y manejo de datos en la era Del Big Data”, optativa de GECO en la Facultad de Economía de la Universitat de València.\nLa web de la asignatura está aquí y los trabajos de mis compañeros de curso puedes verlos aquí.\nMi trabajo lleva por título : “Best Selling Music Artists” Este trabajo está inspirado en mi propia curiosidad sobre el ranking de los mejores artistas que hayan pisado la tierra.Tiene como objetivo analizaros a los artistas de dicha lista a través de varios criterios.\nEl trabajo puede verse aquí.\n\n\n\n\n\n\n\n\n  \n\n\n\n\nTrabajo Individual:Best Selling Music Artists\n\n\n\n\n\n\n\n\n\n\n\n\nJan 5, 2023\n\n\nJuliet Allegra\n\n\n\n\n\n\nNo matching items\n\nReusehttps://creativecommons.org/licenses/by/4.0/deed.es, en"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "",
+    "text": "Repo utilizado para elaborar el trabajo individual para la asignatura “Programación y manejo de datos en la era del Big Data” de la Universitat de València durante el curso 2022-2023. La página web de la asignatura puede verse:aqui"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#introducción",
+    "href": "posts/post-with-code/index.html#introducción",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "1 Introducción",
+    "text": "1 Introducción\nLa música depende de muchas cosas como el gusto, la cultura y la persona a quien le preguntas. La música es un lenguaje entendido por personas de todo el mundo. Y los artistas son los encargados de repartir ese lenguaje a los demás. Este trabajo está inspirado en mi propia curiosidad sobre el ranking de los mejores artistas que hayan pisado la tierra."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#datos",
+    "href": "posts/post-with-code/index.html#datos",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "2 Datos",
+    "text": "2 Datos\nLa organización de música Recording Industry Association of America’s (RIAA) de Estados Unidos realizauna lista de los Best Selling Music Artists con artistas a partir del siglo XX. La lista se basa exclusivamente en la venta de récords mundiales, con ingresos a partir de 75 millones de dólares. Obtuve un Dataset de Kaggle que contiene la informacion de los 121 artistas con mayores ingresos. Dicho Dataset contiene:\n-‘Artist’ : Nombre del artista\n-‘Country’ : País de origen del artista\n-‘period_active’ : Periodo en que el artista realizo su música\n-‘Year’ : Año de lanzamiento de su primer disco registrado\n-‘Genre’ : Genero de música del artista\n-‘TCU’ : Total unidadesde venta\n-‘Sales’ : Ingresos totales de venta en millones de dólares\n\n\nCode\nlibrary(readxl)\nlibrary(dplyr)\nlibrary(tidyverse)\nlibrary(ggplot2)\nlibrary(gridExtra)\nlibrary(ggridges)\nlibrary(Polychrome)\nlibrary(ggrepel)\nlibrary(rworldmap)\nlibrary(plotly)\n\n#Paleta de 50 colores\nP50 = createPalette(50,  c(\"#ff0000\", \"#00ff00\", \"#0000ff\"))"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#ranking-de-los-artistas-según-sus-sales",
+    "href": "posts/post-with-code/index.html#ranking-de-los-artistas-según-sus-sales",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "3 Ranking de los artistas según sus sales",
+    "text": "3 Ranking de los artistas según sus sales\n\n1-4041-8182-121\n\n\n\n\nCode\nbest_selling_artists <- read_excel(\"kaggle/best_selling_artists.xlsx\")\n\n\na1<- best_selling_artists %>% select(\"Artist\",\"Sales\", \"Year\")\na2 <- head(a1,40)\na3 <- a1[41:81,]\na4 <- a1[82:121,]\n\nf1 <-ggplot(a2, aes(x = reorder(Artist, Sales), y= Sales)) + geom_bar(stat = \"identity\", aes(fill=Artist)) + coord_flip()+ labs(x = \"Artist\") + scale_color_manual(P50) + theme(legend.position = \"false\") + theme_bw() \nplotly::ggplotly(f1)\n\n\n\n\n\n\n\n\n\n\nCode\nf2 <- ggplot(a3, aes(x = reorder(Artist, Sales), Sales)) + geom_bar(stat = \"identity\", aes(fill=Artist)) + coord_flip()+ labs(x = \"Artist\")+ scale_color_manual(P50) + theme(legend.position = \"false\") + theme_bw()\nplotly::ggplotly(f2)\n\n\n\n\n\n\n\n\n\n\nCode\nf3<-ggplot(a4, aes(x = reorder(Artist, Sales), Sales)) + geom_bar(stat = \"identity\", aes(fill=Artist)) + coord_flip()+ labs(x = \"Artist\") + scale_color_manual(P50) + theme(legend.position = \"false\") + theme_bw()\nplotly::ggplotly(f3)"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#artistas-segun-su-pais-de-origen",
+    "href": "posts/post-with-code/index.html#artistas-segun-su-pais-de-origen",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "4 Artistas segun su pais de origen",
+    "text": "4 Artistas segun su pais de origen\n\nDatosMapa\n\n\n\n\nCode\nArtist_per_country <- read_excel(\"kaggle/Num_of_artist.xlsx\")\n\nDT::datatable(Artist_per_country)\n\n\n\n\n\n\n\n\n\n\n\nCode\nmap.world <- map_data(\"world\")\n\nmap.world_joined <- left_join(map.world, Artist_per_country, by = c('region' = 'Country'))\n\n\nmap.world_joined <- map.world_joined %>% mutate(fill_flg = ifelse(is.na(Number_of_Artist),F,T))\n\nf4 <- ggplot() +\n  geom_polygon(data = map.world_joined, aes(x = long, y = lat, group = group, fill = fill_flg)) +\n  geom_point() +\n  scale_fill_manual(values = c(\"#CCCCCC\",\" purple\"))  +\n  theme(text = element_text(family = \"Gill Sans\", color = \"#FFFFFF\")\n        ,panel.background = element_rect(fill = \"#444444\")\n        ,plot.background = element_rect(fill = \"#444444\")\n        ,panel.grid = element_blank()\n        ,plot.title = element_text(size = 30)\n        ,plot.subtitle = element_text(size = 10)\n        ,axis.text = element_blank()\n        ,axis.title = element_blank()\n        ,axis.ticks = element_blank()\n        ,legend.position = \"none\") \nplotly::ggplotly(f4)\n\n\n\n\n\n\nComo podemos observar de los 121 artistas la mayoría son del Estados Unidos y Reino Unidos. La industria musical de estos países es fundamental para el mercado demúsica, ya que son hogares de los mejores artistas del mundo. Algo que ambos países tienen en común es el idioma, lo que nos da a entender es que la mayoría de consumo musical en el mundo es en inglés."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#artistas-segun-su-genero-de-música",
+    "href": "posts/post-with-code/index.html#artistas-segun-su-genero-de-música",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "5 Artistas segun su genero de música",
+    "text": "5 Artistas segun su genero de música\n\nDatosTreemap\n\n\n\n\nCode\ndf <- data.frame(\n  Genre = c(\"Rock and Roll\", \"Rock\", \"Reggae\",\"R&B\", \"Progressive rock\", \"Pop rock\", \"Pop\", \"Latin\", \"Jazz\", \"Hip-hop\", \"Heavy Metal\", \"Hard Rock\", \"Country\", \"Celtic\", \"Alternative Rock\"),\n  value = c(1, 19, 1, 16, 1, 20, 25, 3, 1, 9, 3, 7, 8, 1, 4)\n)\n\nDT::datatable(df)\n\n\n\n\n\n\n\n\n\n\n\nCode\n#install.packages(\"treemapify\")\nlibrary(treemapify)\n# install.packages(\"ggplot2\")\nlibrary(ggplot2)\n\nf5<-ggplot(df, aes(area = value, fill = Genre, label = value)) +\n  geom_treemap() +\n  geom_treemap_text(colour = \"white\",\n                    place = \"centre\",\n                    size = 15) \nf5\n\n\n\n\n\nEsta lista estima los géneros musicales con la respectiva popularidad dentro de la sociedad. Existe una relación positiva entre géneros musicales y la cultura. La música se considera un elemento fundamental de la cultura. La música comparte la percepción de una cultura a otra. De los 13 géneros musicales el top 5 son el Pop, Pop- rock, Rock, R&B, Hip-hop. La música pop (popular music) es parte de la cultura popular dirigido al público en general, El hip-hop es parte de la cultura urbana, Rock combina elementos de muchos géneros tales como blues, jazz, country con un toque eléctrico y, R&B es un género que representa la cultura afroamericana. Aun así, la cultura no es un determinante para disfrutar de música, para eso tenemos el gusto."
+  },
+  {
+    "objectID": "posts/post-with-code/index.html#conclucion",
+    "href": "posts/post-with-code/index.html#conclucion",
+    "title": "Trabajo Individual:Best Selling Music Artists",
+    "section": "6 Conclucion",
+    "text": "6 Conclucion\nEl ranking de los mejores artistas musicales según sus ventas certificadas es una lista muy diversa, contiene todo tipo de género musical, nacionalidades, sexos y épocas. Algo que es muy notable es que todos estos artista influyeron de manera única y especial en el mundo musical. Es importante destacar que muchos de estos artistas alcanzaron el éxito hace décadas y aun así su marca en la música fue significativa. Como en los 60s conocido como la “invasión británica” con artistas como the Beatles y the Rolling Stones (ambos dentro del top 15). Estos artista transmiten mensajes, pensamientos, y culturas a través de todo el mundo. Personalmente no me imaginaria que sería la música sin Queen, Elton John o Beyonce entre otros. Es increíble como la música de estos iconos musicales me hacen sentir y es fascinante que millones de personas por el mundo han comprado su música y la escuchan igual que yo. La música para mi nos une como humanos y en un mundo con tanta indiferencia, es importante poder conectar en algo."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Juliet Allegra",
+    "section": "",
+    "text": "Hola, mi nombre es Juliet y soy una estudiante universitaria que está aprendiendo a usar el lenguaje de RStudio.\nEl propósito de este blog es para la presentación del trabajo individual para la asignatura “Programación y manejo de datos en la era del Big Data” de la Universitat de València durante el curso 2022-2023. La página web de la asignatura puede verse:aqui\n\n\nReusehttps://creativecommons.org/licenses/by/4.0/deed.es, en"
+  }
+]
